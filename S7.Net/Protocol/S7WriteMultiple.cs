@@ -6,8 +6,10 @@ namespace S7.Net.Protocol
 {
     internal static class S7WriteMultiple
     {
-        public static int CreateRequest(ByteArray message, DataItem[] dataItems)
+        public static ByteArray CreateRequest(DataItem[] dataItems)
         {
+            var message = new ByteArray();
+
             message.Add(Header.Template);
 
             message[Header.Offsets.ParameterCount] = (byte) dataItems.Length;
@@ -70,7 +72,7 @@ namespace S7.Net.Protocol
             Serialization.SetWordAt(message, Header.Offsets.MessageLength, (ushort) message.Length);
             Serialization.SetWordAt(message, Header.Offsets.DataLength, (ushort) (message.Length - paramOffset));
 
-            return message.Length;
+            return message;
         }
 
         public static void ParseResponse(byte[] message, int length, DataItem[] dataItems)

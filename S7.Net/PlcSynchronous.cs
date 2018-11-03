@@ -370,9 +370,8 @@ namespace S7.Net
         /// <param name="dataItems">The DataItem(s) to write to the PLC.</param>
         public void Write(params DataItem[] dataItems)
         {
-            var message = new ByteArray();
-            var length = S7WriteMultiple.CreateRequest(message, dataItems);
-            stream.Write(message.Array, 0, length);
+            var message = S7WriteMultiple.CreateRequest(dataItems);
+            stream.Write(message.Array, 0, message.Length);
 
             var response = COTP.TSDU.Read(stream);
             S7WriteMultiple.ParseResponse(response, response.Length, dataItems);

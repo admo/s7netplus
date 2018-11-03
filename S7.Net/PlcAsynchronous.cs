@@ -405,9 +405,8 @@ namespace S7.Net
         /// <returns>Task that completes when response from PLC is parsed.</returns>
         public async Task WriteAsync(params DataItem[] dataItems)
         {
-            var message = new ByteArray();
-            var length = S7WriteMultiple.CreateRequest(message, dataItems);
-            await stream.WriteAsync(message.Array, 0, length).ConfigureAwait(false);
+            var message = S7WriteMultiple.CreateRequest(dataItems);
+            await stream.WriteAsync(message.Array, 0, message.Length).ConfigureAwait(false);
 
             var response = await COTP.TSDU.ReadAsync(stream).ConfigureAwait(false);
             S7WriteMultiple.ParseResponse(response, response.Length, dataItems);
