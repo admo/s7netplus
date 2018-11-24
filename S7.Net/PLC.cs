@@ -111,10 +111,8 @@ namespace S7.Net
         /// </summary>
         public void Close()
         {
-            if (tcpClient != null)
-            {
-                if (tcpClient.Connected) tcpClient.Close();
-            }
+            stream?.Close();
+            tcpClient?.Close();
         }
 
         #region IDisposable Support
