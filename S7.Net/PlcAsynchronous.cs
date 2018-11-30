@@ -21,21 +21,29 @@ namespace S7.Net
         {
             await ConnectAsync();
 
-            await stream.WriteAsync(ConnectionRequest.GetCOTPConnectionRequest(CPU, Rack, Slot), 0, 22);
-            var response = await COTP.TPDU.ReadAsync(stream);
-            if (response.PDUType != 0xd0) //Connect Confirm
+            try
             {
-                throw new WrongNumberOfBytesException("Waiting for COTP connect confirm");
+                await stream.WriteAsync(ConnectionRequest.GetCOTPConnectionRequest(CPU, Rack, Slot), 0, 22);
+                var response = await COTP.TPDU.ReadAsync(stream);
+                if (response.PDUType != 0xd0) //Connect Confirm
+                {
+                    throw new WrongNumberOfBytesException("Waiting for COTP connect confirm");
+                }
+
+                await stream.WriteAsync(GetS7ConnectionSetup(), 0, 25);
+
+                var s7data = await COTP.TSDU.ReadAsync(stream);
+                if (s7data == null || s7data[1] != 0x03) //Check for S7 Ack Data
+                {
+                    throw new WrongNumberOfBytesException("Waiting for S7 connection setup");
+                }
+                MaxPDUSize = (short)(s7data[18] * 256 + s7data[19]);
             }
-
-            await stream.WriteAsync(GetS7ConnectionSetup(), 0, 25);
-
-            var s7data = await COTP.TSDU.ReadAsync(stream);
-            if (s7data == null || s7data[1] != 0x03) //Check for S7 Ack Data
+            catch (Exception exc)
             {
-                throw new WrongNumberOfBytesException("Waiting for S7 connection setup");
+                throw new PlcException(ErrorCode.ConnectionError,
+                    $"Couldn't establish the connection to {IP}.\nMessage: {exc.Message}", exc);
             }
-            MaxPDUSize = (short)(s7data[18] * 256 + s7data[19]);
         }
 
         private async Task ConnectAsync()
