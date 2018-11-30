@@ -49,13 +49,13 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(float value)
         {
-            byte[] bytes = BitConverter.GetBytes((float)(value));
+            byte[] bytes = BitConverter.GetBytes(value);
 
             // sps uses bigending so we have to check if platform is same
-            if (!BitConverter.IsLittleEndian) return bytes;
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
             
-            // create deep copy of the array and reverse
-            return new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
+            return bytes;
         }
 
         /// <summary>
@@ -63,10 +63,15 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(float[] value)
         {
-            ByteArray arr = new ByteArray();
-            foreach (float val in value)
-                arr.Add(ToByteArray(val));
-            return arr.Array;
+            const int valueSize = sizeof(float);
+            byte[] bytes = new byte[value.Length * valueSize];
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                byte[] valueBytes = ToByteArray(value[i]);
+                Array.Copy(valueBytes, 0, bytes, i * valueSize, valueBytes.Length);
+            }
+            return bytes;
         }
 
         /// <summary>

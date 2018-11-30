@@ -28,14 +28,9 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(Int32 value)
         {
-            byte[] bytes = new byte[4];
-
-            bytes[0] = (byte)((value >> 24) & 0xFF);
-            bytes[1] = (byte)((value >> 16) & 0xFF);
-            bytes[2] = (byte)((value >> 8) & 0xFF);
-            bytes[3] = (byte)((value) & 0xFF);
-
-            return bytes;
+            return BitConverter.IsLittleEndian
+                ? new byte[] { (byte)((value >> 24) & 0xFF), (byte)((value >> 16) & 0xFF), (byte)((value >> 8) & 0xFF), (byte)(value & 0xFF) }
+                : new byte[] { (byte)(value & 0xFF), (byte)((value >> 8) & 0xFF), (byte)((value >> 16) & 0xFF), (byte)((value >> 24) & 0xFF) };
         }
 
         /// <summary>
@@ -43,10 +38,15 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(Int32[] value)
         {
-            ByteArray arr = new ByteArray();
-            foreach (Int32 val in value)
-                arr.Add(ToByteArray(val));
-            return arr.Array;
+            const int valueSize = sizeof(Int32);
+            byte[] bytes = new byte[value.Length * valueSize];
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                byte[] valueBytes = ToByteArray(value[i]);
+                Array.Copy(valueBytes, 0, bytes, i * valueSize, valueBytes.Length);
+            }
+            return bytes;
         }
 
         /// <summary>

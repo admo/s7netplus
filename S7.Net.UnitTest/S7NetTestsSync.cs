@@ -948,6 +948,51 @@ namespace S7.Net.UnitTest
             Assert.AreEqual(test_value, test_value2, "Compare Write/Read"); //No delta, datatype matches
         }
 
+        [TestMethod]
+        public void T31_ReadWriteIntArray()
+        {
+            var test_values = new Int16[] { 1234, 4321 };
+            plc.Write("DB1.DBW0", test_values);
+            var received_values = (Int16[])plc.Read(DataType.DataBlock, 1, 0, VarType.Int, 2);
+            CollectionAssert.AreEqual(test_values, received_values);
+        }
+
+        [TestMethod]
+        public void T33_ReadWriteDIntArray()
+        {
+            var test_values = new Int32[] { 1234, 4321 };
+            plc.Write("DB1.DBW0", test_values);
+            var received_values = (Int32[])plc.Read(DataType.DataBlock, 1, 0, VarType.DInt, 2);
+            CollectionAssert.AreEqual(test_values, received_values);
+        }
+
+        [TestMethod]
+        public void T34_ReadWriteWordArray()
+        {
+            var test_values = new UInt16[] { 1234, 4321 };
+            plc.Write("DB1.DBW0", test_values);
+            var received_values = (UInt16[])plc.Read(DataType.DataBlock, 1, 0, VarType.Word, 2);
+            CollectionAssert.AreEqual(test_values, received_values);
+        }
+
+        [TestMethod]
+        public void T35_ReadWriteDWordArray()
+        {
+            var test_values = new UInt32[] { 1234, 4321 };
+            plc.Write("DB1.DBW0", test_values);
+            var received_values = (UInt32[])plc.Read(DataType.DataBlock, 1, 0, VarType.DWord, 2);
+            CollectionAssert.AreEqual(test_values, received_values);
+        }
+
+        [TestMethod]
+        public void T36_ReadWriteRealArray()
+        {
+            var test_values = new float[] { 1234, 4321 };
+            plc.Write("DB1.DBW0", test_values);
+            var received_values = (float[])plc.Read(DataType.DataBlock, 1, 0, VarType.Real, 2);
+            CollectionAssert.AreEqual(test_values, received_values);
+        }
+
         #endregion
 
         #region Private methods

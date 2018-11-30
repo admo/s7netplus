@@ -50,11 +50,9 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(UInt16 value)
         {
-            byte[] bytes = new byte[2];
-            bytes[1] = (byte)((int)value & 0xFF);
-            bytes[0] = (byte)((int)value >> 8 & 0xFF);
-
-            return bytes;
+            return BitConverter.IsLittleEndian
+                ? new byte[] { (byte)((value >> 8) & 0xFF), (byte)(value & 0xFF) }
+                : new byte[] { (byte)(value & 0xFF), (byte)((value >> 8) & 0xFF) };
         }
 
         /// <summary>
@@ -62,10 +60,15 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(UInt16[] value)
         {
-            ByteArray arr = new ByteArray();
-            foreach (UInt16 val in value)
-                arr.Add(ToByteArray(val));
-            return arr.Array;
+            const int valueSize = sizeof(UInt16);
+            byte[] bytes = new byte[value.Length * valueSize];
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                byte[] valueBytes = ToByteArray(value[i]);
+                Array.Copy(valueBytes, 0, bytes, i * valueSize, valueBytes.Length);
+            }
+            return bytes;
         }
 
         /// <summary>

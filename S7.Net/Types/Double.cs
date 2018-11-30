@@ -49,13 +49,13 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(double value)
         {
-            byte[] bytes = BitConverter.GetBytes((float)(value));
+            byte[] bytes = BitConverter.GetBytes((float)value);
 
             // sps uses bigending so we have to check if platform is same
-            if (!BitConverter.IsLittleEndian) return bytes;
-            
-            // create deep copy of the array and reverse
-            return new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            return bytes;
         }
 
         /// <summary>
@@ -63,22 +63,26 @@ namespace S7.Net.Types
         /// </summary>
         public static byte[] ToByteArray(double[] value)
         {
-            ByteArray arr = new ByteArray();
-            foreach (double val in value)
-                arr.Add(ToByteArray(val));
-            return arr.Array;
+            const int valueSize = sizeof(float);
+            byte[] bytes = new byte[value.Length * valueSize];
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                byte[] valueBytes = ToByteArray(value[i]);
+                Array.Copy(valueBytes, 0, bytes, i * valueSize, valueBytes.Length);
+            }
+            return bytes;
         }
 
         /// <summary>
         /// Converts an array of S7 Real to an array of double
         /// </summary>
-        public static double[] ToArray(byte[] bytes)
+        public static double[] ToArray(byte[] bytes, int varCount, int startByte)
         {
-            double[] values = new double[bytes.Length / 4];
+            double[] values = new double[varCount];
 
-            int counter = 0;
-            for (int cnt = 0; cnt < bytes.Length / 4; cnt++)
-                values[cnt] = FromByteArray(new byte[] { bytes[counter++], bytes[counter++], bytes[counter++], bytes[counter++] });
+            for (int cnt = 0; cnt < varCount; cnt++, startByte += 4)
+                values[cnt] = FromByteArray(bytes, startByte);
 
             return values;
         }
