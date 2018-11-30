@@ -81,7 +81,7 @@ namespace S7.Net
         /// <param name="varCount"></param>
         /// <param name="bitAdr"></param>
         /// <returns></returns>
-        private object ParseBytes(VarType varType, byte[] bytes, int varCount, byte bitAdr = 0)
+        public static object ParseBytes(VarType varType, byte[] bytes, int varCount, byte bitAdr, int startByte = 0)
         {
             if (bytes == null || bytes.Length == 0)
                 return null;
@@ -90,61 +90,61 @@ namespace S7.Net
             {
                 case VarType.Byte:
                     if (varCount == 1)
-                        return bytes[0];
+                        return bytes[startByte];
                     else
-                        return bytes;
+                        return bytes.Skip(startByte).Take(varCount).ToArray();
                 case VarType.Word:
                     if (varCount == 1)
-                        return Word.FromByteArray(bytes);
+                        return Word.FromByteArray(bytes, startByte);
                     else
-                        return Word.ToArray(bytes);
+                        return Word.ToArray(bytes, varCount, startByte);
                 case VarType.Int:
                     if (varCount == 1)
-                        return Int.FromByteArray(bytes);
+                        return Int.FromByteArray(bytes, startByte);
                     else
-                        return Int.ToArray(bytes);
+                        return Int.ToArray(bytes, varCount, startByte);
                 case VarType.DWord:
                     if (varCount == 1)
-                        return DWord.FromByteArray(bytes);
+                        return DWord.FromByteArray(bytes, startByte);
                     else
-                        return DWord.ToArray(bytes);
+                        return DWord.ToArray(bytes, varCount, startByte);
                 case VarType.DInt:
                     if (varCount == 1)
-                        return DInt.FromByteArray(bytes);
+                        return DInt.FromByteArray(bytes, startByte);
                     else
-                        return DInt.ToArray(bytes);
+                        return DInt.ToArray(bytes, varCount, startByte);
                 case VarType.Real:
                     if (varCount == 1)
-                        return Types.Single.FromByteArray(bytes);
+                        return Types.Single.FromByteArray(bytes, startByte);
                     else
-                        return Types.Single.ToArray(bytes);
+                        return Types.Single.ToArray(bytes, varCount, startByte);
 
                 case VarType.String:
-                    return Types.String.FromByteArray(bytes);
+                    return Types.String.FromByteArray(bytes, varCount, startByte);
                 case VarType.StringEx:
-                    return StringEx.FromByteArray(bytes);
+                    return StringEx.FromByteArray(bytes, startByte);
 
                 case VarType.Timer:
                     if (varCount == 1)
-                        return Timer.FromByteArray(bytes);
+                        return Timer.FromByteArray(bytes, startByte);
                     else
-                        return Timer.ToArray(bytes);
+                        return Timer.ToArray(bytes, varCount, startByte);
                 case VarType.Counter:
                     if (varCount == 1)
-                        return Counter.FromByteArray(bytes);
+                        return Counter.FromByteArray(bytes, startByte);
                     else
-                        return Counter.ToArray(bytes);
+                        return Counter.ToArray(bytes, varCount, startByte);
                 case VarType.Bit:
                     if (varCount == 1)
                     {
                         if (bitAdr > 7)
                             return null;
                         else
-                            return Bit.FromByte(bytes[0], bitAdr);
+                            return Bit.FromByte(bytes[startByte], bitAdr);
                     }
                     else
                     {
-                        return Bit.ToBitArray(bytes);
+                        return Bit.ToBitArray(bytes, varCount, startByte);
                     }
                 default:
                     return null;
@@ -205,9 +205,10 @@ namespace S7.Net
                 int byteCnt = VarTypeToByteLength(dataItem.VarType, dataItem.Count);
                 dataItem.Value = ParseBytes(
                     dataItem.VarType,
-                    s7data.Skip(offset).Take(byteCnt).ToArray(),
+                    s7data,
                     dataItem.Count,
-                    dataItem.BitAdr
+                    dataItem.BitAdr,
+                    offset
                 );
 
                 // next Item

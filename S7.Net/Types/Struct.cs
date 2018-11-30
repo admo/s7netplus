@@ -116,8 +116,7 @@ namespace S7.Net.Types
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
                         // hier auswerten
-                        ushort source = Word.FromBytes(bytes[(int)numBytes + 1], bytes[(int)numBytes]);
-                        info.SetValue(structValue, source.ConvertToShort());
+                        info.SetValue(structValue, Int.FromByteArray(bytes, (int)numBytes));
                         numBytes += 2;
                         break;
                     case "UInt16":
@@ -125,8 +124,7 @@ namespace S7.Net.Types
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
                         // hier auswerten
-                        info.SetValue(structValue, Word.FromBytes(bytes[(int)numBytes + 1],
-                                                                          bytes[(int)numBytes]));
+                        info.SetValue(structValue, Word.FromByteArray(bytes, (int)numBytes));
                         numBytes += 2;
                         break;
                     case "Int32":
@@ -134,11 +132,7 @@ namespace S7.Net.Types
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
                         // hier auswerten
-                        uint sourceUInt = DWord.FromBytes(bytes[(int)numBytes + 3],
-                                                                           bytes[(int)numBytes + 2],
-                                                                           bytes[(int)numBytes + 1],
-                                                                           bytes[(int)numBytes + 0]);
-                        info.SetValue(structValue, sourceUInt.ConvertToInt());
+                        info.SetValue(structValue, DInt.FromByteArray(bytes, (int)numBytes));
                         numBytes += 4;
                         break;
                     case "UInt32":
@@ -146,10 +140,7 @@ namespace S7.Net.Types
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
                         // hier auswerten
-                        info.SetValue(structValue, DWord.FromBytes(bytes[(int)numBytes],
-                                                                           bytes[(int)numBytes + 1],
-                                                                           bytes[(int)numBytes + 2],
-                                                                           bytes[(int)numBytes + 3]));
+                        info.SetValue(structValue, DWord.FromByteArray(bytes, (int)numBytes));
                         numBytes += 4;
                         break;
                     case "Double":
@@ -157,10 +148,7 @@ namespace S7.Net.Types
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
                         // hier auswerten
-                        info.SetValue(structValue, Double.FromByteArray(new byte[] { bytes[(int)numBytes],
-                                                                           bytes[(int)numBytes + 1],
-                                                                           bytes[(int)numBytes + 2],
-                                                                           bytes[(int)numBytes + 3] }));
+                        info.SetValue(structValue, Double.FromByteArray(bytes, (int)numBytes));
                         numBytes += 4;
                         break;
                     case "Single":
@@ -168,10 +156,7 @@ namespace S7.Net.Types
                         if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                             numBytes++;
                         // hier auswerten
-                        info.SetValue(structValue, Single.FromByteArray(new byte[] { bytes[(int)numBytes],
-                                                                           bytes[(int)numBytes + 1],
-                                                                           bytes[(int)numBytes + 2],
-                                                                           bytes[(int)numBytes + 3] }));
+                        info.SetValue(structValue, Single.FromByteArray(bytes, (int)numBytes));
                         numBytes += 4;
                         break;
                     default:

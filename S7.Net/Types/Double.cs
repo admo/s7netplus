@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace S7.Net.Types
 {
@@ -10,21 +11,16 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts a S7 Real (4 bytes) to double
         /// </summary>
-        public static double FromByteArray(byte[] bytes)
+        public static double FromByteArray(byte[] bytes, int startByte)
         {
-            if (bytes.Length != 4)
+            if (bytes.Length - startByte < 4)
             {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 4 bytes.");
             }
 
-            // sps uses bigending so we have to reverse if platform needs
-            if (BitConverter.IsLittleEndian)
-            {
-                // create deep copy of the array and reverse
-                bytes = new byte[] { bytes[3], bytes[2], bytes[1], bytes[0] };
-            }
-
-            return BitConverter.ToSingle(bytes, 0);
+            return BitConverter.IsLittleEndian
+                ? BitConverter.ToSingle(bytes.Skip(startByte).Take(4).Reverse().ToArray(), 0)
+                : BitConverter.ToSingle(bytes, startByte);
         }
 
         /// <summary>
@@ -33,7 +29,7 @@ namespace S7.Net.Types
         public static double FromDWord(Int32 value)
         {
             byte[] b = DInt.ToByteArray(value);
-            double d = FromByteArray(b);
+            double d = FromByteArray(b, 0);
             return d;
         }
 
@@ -43,7 +39,7 @@ namespace S7.Net.Types
         public static double FromDWord(UInt32 value)
         {
             byte[] b = DWord.ToByteArray(value);
-            double d = FromByteArray(b);
+            double d = FromByteArray(b, 0);
             return d;
         }
 

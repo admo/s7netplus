@@ -22,7 +22,7 @@ namespace S7.Net.Types
         /// <returns></returns>
         public static byte FromByteArray(byte[] bytes)
         {
-            if (bytes.Length != 1)
+            if (bytes.Length < 1)
             {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 1 bytes.");
             }

@@ -10,14 +10,16 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts a word (2 bytes) to ushort (UInt16)
         /// </summary>
-        public static UInt16 FromByteArray(byte[] bytes)
+        public static UInt16 FromByteArray(byte[] bytes, int startByte)
         {
-            if (bytes.Length != 2)
+            if (bytes.Length-startByte < 2)
             {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 2 bytes.");
             }
 
-            return (UInt16)((bytes[0] << 8) | bytes[1]);
+            return BitConverter.IsLittleEndian
+                ? (UInt16)((bytes[startByte++] << 8) | bytes[startByte++])
+                : (UInt16)(bytes[startByte++] | (bytes[startByte++] << 8));
         }
 
 
@@ -57,13 +59,12 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts an array of bytes to an array of ushort
         /// </summary>
-        public static UInt16[] ToArray(byte[] bytes)
+        public static UInt16[] ToArray(byte[] bytes, int varCount, int startByte)
         {
-            UInt16[] values = new UInt16[bytes.Length/2];
-
-            int counter = 0;
-            for (int cnt = 0; cnt < bytes.Length/2; cnt++)
-                values[cnt] = FromByteArray(new byte[] {bytes[counter++], bytes[counter++]});
+            UInt16[] values = new UInt16[varCount];
+            
+            for (int cnt = 0; cnt < varCount; cnt++, startByte += 2)
+                values[cnt] = FromByteArray(bytes, startByte);
 
             return values;
         }

@@ -74,7 +74,7 @@ namespace S7.Net.UnitTest.TypeTests
 
         private static void AssertFromByteArrayEquals(string expected, params byte[] bytes)
         {
-            Assert.AreEqual(expected, String.FromByteArray(bytes));
+            Assert.AreEqual(expected, String.FromByteArray(bytes, expected.Length, 0));
         }
 
         private static void AssertToByteArrayEquals(string value, int reservedLength, params byte[] expected)

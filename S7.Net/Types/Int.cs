@@ -10,15 +10,16 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts a S7 Int (2 bytes) to short (Int16)
         /// </summary>
-        public static short FromByteArray(byte[] bytes)
+        public static short FromByteArray(byte[] bytes, int startByte)
         {
-            if (bytes.Length != 2)
+            if (bytes.Length-startByte < 2)
             {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 2 bytes.");
             }
-            // bytes[0] -> HighByte
-            // bytes[1] -> LowByte
-            return (short)((int)(bytes[1]) | ((int)(bytes[0]) << 8));
+
+            return BitConverter.IsLittleEndian
+                ? (short)((bytes[startByte++] << 8) | bytes[startByte++])
+                : (short)(bytes[startByte++] | (bytes[startByte++] << 8));
         }
 
 
@@ -54,15 +55,12 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts an array of S7 Int to an array of short (Int16)
         /// </summary>
-        public static Int16[] ToArray(byte[] bytes)
+        public static Int16[] ToArray(byte[] bytes, int varCount, int startByte)
         {
-            int shortsCount = bytes.Length / 2;
-
-            Int16[] values = new Int16[shortsCount];
-
-            int counter = 0;
-            for (int cnt = 0; cnt < shortsCount; cnt++)
-                values[cnt] = FromByteArray(new byte[] { bytes[counter++], bytes[counter++] });
+            Int16[] values = new Int16[varCount];
+            
+            for (int cnt = 0; cnt < varCount; cnt++, startByte += 2)
+                values[cnt] = FromByteArray(bytes, startByte);
 
             return values;
         }

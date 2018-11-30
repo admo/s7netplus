@@ -28,9 +28,9 @@
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public static string FromByteArray(byte[] bytes)
+        public static string FromByteArray(byte[] bytes, int varCount, int startByte)
         {
-            return System.Text.Encoding.ASCII.GetString(bytes);
+            return System.Text.Encoding.ASCII.GetString(bytes, startByte, varCount);
         }
 
     }

@@ -15,14 +15,14 @@ namespace S7.Net.Types
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public static string FromByteArray(byte[] bytes)
+        public static string FromByteArray(byte[] bytes, int startByte)
         {
-            if (bytes.Length < 2) return "";
+            if (bytes.Length - startByte < 2) return "";
 
-            int size = bytes[0];
-            int length = bytes[1];
+            int size = bytes[startByte++];
+            int length = bytes[startByte++];
 
-            return System.Text.Encoding.ASCII.GetString(bytes, 2, length);
+            return System.Text.Encoding.ASCII.GetString(bytes, startByte, length);
         }
 
         /// <summary>

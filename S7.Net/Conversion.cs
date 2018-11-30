@@ -208,7 +208,7 @@ namespace S7.Net
         public static UInt32 ConvertToUInt(this double input)
         {
             uint output;
-            output = S7.Net.Types.DWord.FromByteArray(S7.Net.Types.Double.ToByteArray(input));
+            output = S7.Net.Types.DWord.FromByteArray(S7.Net.Types.Double.ToByteArray(input), 0);
             return output;
         }
 
@@ -220,7 +220,7 @@ namespace S7.Net
         public static UInt32 ConvertToUInt(this float input)
         {
             uint output;
-            output = S7.Net.Types.DWord.FromByteArray(S7.Net.Types.Single.ToByteArray(input));
+            output = S7.Net.Types.DWord.FromByteArray(S7.Net.Types.Single.ToByteArray(input), 0);
             return output;
         }
 
@@ -233,7 +233,7 @@ namespace S7.Net
         public static double ConvertToDouble(this uint input)
         {
             double output;
-            output = S7.Net.Types.Double.FromByteArray(S7.Net.Types.DWord.ToByteArray(input));
+            output = S7.Net.Types.Double.FromByteArray(S7.Net.Types.DWord.ToByteArray(input), 0);
             return output;
         }
 
@@ -245,7 +245,7 @@ namespace S7.Net
         public static float ConvertToFloat(this uint input)
         {
             float output;
-            output = S7.Net.Types.Single.FromByteArray(S7.Net.Types.DWord.ToByteArray(input));
+            output = S7.Net.Types.Single.FromByteArray(S7.Net.Types.DWord.ToByteArray(input), 0);
             return output;
         }
     }

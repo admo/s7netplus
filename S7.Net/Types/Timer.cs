@@ -10,18 +10,23 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts the timer bytes to a double
         /// </summary>
-        public static double FromByteArray(byte[] bytes)
+        public static double FromByteArray(byte[] bytes, int startByte)
         {
+            if (bytes.Length - startByte < 2)
+            {
+                throw new ArgumentException("Wrong number of bytes. Bytes array must contain 2 bytes.");
+            }
+
             double wert = 0;
 
-            wert = ((bytes[0]) & 0x0F) * 100.0;
-            wert += ((bytes[1] >> 4) & 0x0F) * 10.0;
-            wert += ((bytes[1]) & 0x0F) * 1.0;
+            wert = ((bytes[startByte]) & 0x0F) * 100.0;
+            wert += ((bytes[startByte + 1] >> 4) & 0x0F) * 10.0;
+            wert += ((bytes[startByte + 1]) & 0x0F) * 1.0;
 
             // this value is not used... may for a nother exponation
             //int unknown = (bytes[0] >> 6) & 0x03;
 
-            switch ((bytes[0] >> 4) & 0x03)
+            switch ((bytes[startByte] >> 4) & 0x03)
             {
                 case 0:
                     wert *= 0.01;
@@ -68,13 +73,12 @@ namespace S7.Net.Types
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public static double[] ToArray(byte[] bytes)
+        public static double[] ToArray(byte[] bytes, int varCount, int startByte)
         {
-            double[] values = new double[bytes.Length / 2];
-
-            int counter = 0;
-            for (int cnt = 0; cnt < bytes.Length / 2; cnt++)
-                values[cnt] = FromByteArray(new byte[] { bytes[counter++], bytes[counter++] });
+            double[] values = new double[varCount];
+            
+            for (int cnt = 0; cnt < varCount; cnt++, startByte += 2)
+                values[cnt] = FromByteArray(bytes, startByte);
 
             return values;
         }

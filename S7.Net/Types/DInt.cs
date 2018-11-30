@@ -10,13 +10,16 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts a S7 DInt (4 bytes) to int (Int32)
         /// </summary>
-        public static Int32 FromByteArray(byte[] bytes)
+        public static Int32 FromByteArray(byte[] bytes, int startByte)
         {
-            if (bytes.Length != 4)
+            if (bytes.Length - startByte < 4)
             {
                 throw new ArgumentException("Wrong number of bytes. Bytes array must contain 4 bytes.");
             }
-            return bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+
+            return BitConverter.IsLittleEndian
+                ? (bytes[startByte++] << 24) | (bytes[startByte++] << 16) | (bytes[startByte++] << 8) | bytes[startByte++]
+                : bytes[startByte++] | (bytes[startByte++] << 8) | (bytes[startByte++] << 16) | (bytes[startByte++] << 24);
         }
 
 
@@ -49,13 +52,12 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts an array of S7 DInt to an array of int (Int32)
         /// </summary>
-        public static Int32[] ToArray(byte[] bytes)
+        public static Int32[] ToArray(byte[] bytes, int varCount, int startByte)
         {
-            Int32[] values = new Int32[bytes.Length / 4];
-
-            int counter = 0;
-            for (int cnt = 0; cnt < bytes.Length / 4; cnt++)
-                values[cnt] = FromByteArray(new byte[] { bytes[counter++], bytes[counter++], bytes[counter++], bytes[counter++] });
+            Int32[] values = new Int32[varCount];
+            
+            for (int cnt = 0; cnt < varCount; cnt++, startByte += 4)
+                values[cnt] = FromByteArray(bytes, startByte);
 
             return values;
         }

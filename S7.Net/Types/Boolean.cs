@@ -10,7 +10,7 @@
         /// </summary>
         public static bool GetValue(byte value, int bit)
         {
-            return (((int)value & (1 << bit)) != 0);
+            return (value & (1 << bit)) != 0;
         }
 
         /// <summary>

@@ -132,8 +132,7 @@ namespace S7.Net.Types
                     if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                         numBytes++;
                     // hier auswerten
-                    ushort source = Word.FromBytes(bytes[(int)numBytes + 1], bytes[(int)numBytes]);
-                    value = source.ConvertToShort();
+                    value = Int.FromByteArray(bytes, (int)numBytes);
                     numBytes += 2;
                     break;
                 case "UInt16":
@@ -141,7 +140,7 @@ namespace S7.Net.Types
                     if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                         numBytes++;
                     // hier auswerten
-                    value = Word.FromBytes(bytes[(int)numBytes + 1], bytes[(int)numBytes]);
+                    value = Word.FromByteArray(bytes, (int)numBytes);
                     numBytes += 2;
                     break;
                 case "Int32":
@@ -149,11 +148,7 @@ namespace S7.Net.Types
                     if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                         numBytes++;
                     // hier auswerten
-                    uint sourceUInt = DWord.FromBytes(bytes[(int)numBytes + 3],
-                                                                       bytes[(int)numBytes + 2],
-                                                                       bytes[(int)numBytes + 1],
-                                                                       bytes[(int)numBytes + 0]);
-                    value = sourceUInt.ConvertToInt();
+                    value = DInt.FromByteArray(bytes, (int)numBytes);
                     numBytes += 4;
                     break;
                 case "UInt32":
@@ -161,11 +156,7 @@ namespace S7.Net.Types
                     if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                         numBytes++;
                     // hier auswerten
-                    value = DWord.FromBytes(
-                        bytes[(int)numBytes],
-                        bytes[(int)numBytes + 1],
-                        bytes[(int)numBytes + 2],
-                        bytes[(int)numBytes + 3]);
+                    value = DWord.FromByteArray(bytes, (int)numBytes);
                     numBytes += 4;
                     break;
                 case "Double":
@@ -173,12 +164,7 @@ namespace S7.Net.Types
                     if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                         numBytes++;
                     // hier auswerten
-                    value = Double.FromByteArray(
-                        new byte[] {
-                            bytes[(int)numBytes],
-                            bytes[(int)numBytes + 1],
-                            bytes[(int)numBytes + 2],
-                            bytes[(int)numBytes + 3] });
+                    value = Double.FromByteArray(bytes, (int)numBytes);
                     numBytes += 4;
                     break;
                 case "Single":
@@ -186,12 +172,7 @@ namespace S7.Net.Types
                     if ((numBytes / 2 - Math.Floor(numBytes / 2.0)) > 0)
                         numBytes++;
                     // hier auswerten
-                    value = Single.FromByteArray(
-                        new byte[] {
-                            bytes[(int)numBytes],
-                            bytes[(int)numBytes + 1],
-                            bytes[(int)numBytes + 2],
-                            bytes[(int)numBytes + 3] });
+                    value = Single.FromByteArray(bytes, (int)numBytes);
                     numBytes += 4;
                     break;
                 default:
@@ -215,16 +196,13 @@ namespace S7.Net.Types
         /// </summary>
         /// <param name="sourceClass">The object to fill in the given array of bytes</param>
         /// <param name="bytes">The array of bytes</param>
-        public static void FromBytes(object sourceClass, byte[] bytes)
+        public static void FromBytes(object sourceClass, byte[] bytes, double numBytes = 0.0)
         {
             if (bytes == null)
                 return;
 
-            if (bytes.Length != GetClassSize(sourceClass))
+            if (bytes.Length < GetClassSize(sourceClass))
                 return;
-
-            // and decode it
-            double numBytes = 0.0;
 
             var properties = GetAccessableProperties(sourceClass.GetType());
             foreach (var property in properties)

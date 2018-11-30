@@ -10,9 +10,16 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts a S7 DWord (4 bytes) to uint (UInt32)
         /// </summary>
-        public static UInt32 FromByteArray(byte[] bytes)
+        public static UInt32 FromByteArray(byte[] bytes, int startByte)
         {
-            return (UInt32)(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
+            if (bytes.Length - startByte < 2)
+            {
+                throw new ArgumentException("Wrong number of bytes. Bytes array must contain 4 bytes.");
+            }
+
+            return BitConverter.IsLittleEndian
+                ? (UInt32)(bytes[startByte++] << 24 | bytes[startByte++] << 16 | bytes[startByte++] << 8 | bytes[startByte++])
+                : (UInt32)(bytes[startByte++] | bytes[startByte++] << 8 | bytes[startByte++] << 16 | bytes[startByte++] << 24);
         }
 
 
@@ -59,13 +66,12 @@ namespace S7.Net.Types
         /// <summary>
         /// Converts an array of S7 DWord to an array of uint (UInt32)
         /// </summary>
-        public static UInt32[] ToArray(byte[] bytes)
+        public static UInt32[] ToArray(byte[] bytes, int varCount, int startByte)
         {
-            UInt32[] values = new UInt32[bytes.Length / 4];
-
-            int counter = 0;
-            for (int cnt = 0; cnt < bytes.Length / 4; cnt++)
-                values[cnt] = FromByteArray(new byte[] { bytes[counter++], bytes[counter++], bytes[counter++], bytes[counter++] });
+            UInt32[] values = new UInt32[varCount];
+            
+            for (int cnt = 0; cnt < varCount; cnt++, startByte += 4)
+                values[cnt] = FromByteArray(bytes, startByte);
 
             return values;
         }
